@@ -8,29 +8,29 @@ import (
 	"net/http"
 )
 
-// AddRequest estructura para la solicitud de suma
+// AddRequest structure for the addition request
 type AddRequest struct {
 	XMLName xml.Name `xml:"Add"`
 	A       int      `xml:"a"`
 	B       int      `xml:"b"`
 }
 
-// AddResponse estructura para la respuesta de suma
+// AddResponse structure for the addition response
 type AddResponse struct {
 	XMLName xml.Name `xml:"AddResponse"`
 	Result  int      `xml:"result"`
 }
 
-// handleSOAP maneja las solicitudes SOAP
+// handleSOAP handles SOAP requests
 func handleSOAP(w http.ResponseWriter, r *http.Request) {
-	// Leer el cuerpo de la solicitud
+	// Read the request body
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
 		return
 	}
 
-	// Deserializar el cuerpo XML de la solicitud
+	// Deserialize the XML request body
 	var envelope struct {
 		XMLName xml.Name `xml:"Envelope"`
 		Body    struct {
@@ -45,13 +45,13 @@ func handleSOAP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Verificar si la solicitud contiene los datos de la operación Add
+	// Check if the request contains the Add operation data
 	if envelope.Body.Add != nil {
-		// Realizar la operación de suma
+		// Perform the addition operation
 		result := envelope.Body.Add.A + envelope.Body.Add.B
 		response := AddResponse{Result: result}
 
-		// Preparar la respuesta SOAP
+		// Prepare the SOAP response
 		w.Header().Set("Content-Type", "text/xml")
 		fmt.Fprintf(w, `<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 		<soap:Body>
@@ -67,10 +67,10 @@ func handleSOAP(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	// Definir la ruta del servicio SOAP
+	// Define the SOAP service route
 	http.HandleFunc("/math", handleSOAP)
 
-	// Iniciar el servidor en el puerto 8080
+	// Start the server on port 8080
 	fmt.Println("SOAP server running on http://localhost:8080/math")
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
