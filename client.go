@@ -9,16 +9,16 @@ import (
 	"net/http"
 )
 
-// AddRequest estructura para la solicitud de suma
+// AddRequest structure for the addition request
 type AddRequest struct {
 	XMLName xml.Name `xml:"Add"`
 	A       int      `xml:"a"`
 	B       int      `xml:"b"`
 }
 
-// sendSOAPRequest envía la solicitud SOAP y devuelve la respuesta
+// sendSOAPRequest sends the SOAP request and returns the response
 func sendSOAPRequest(url string, requestBody AddRequest) ([]byte, error) {
-	// Crear el sobre SOAP
+	// Create the SOAP envelope
 	envelope := struct {
 		XMLName xml.Name `xml:"soap:Envelope"`
 		Xmlns   string   `xml:"xmlns:soap,attr"`
@@ -37,13 +37,13 @@ func sendSOAPRequest(url string, requestBody AddRequest) ([]byte, error) {
 		},
 	}
 
-	// Serializar el sobre SOAP a XML
+	// Serialize the SOAP envelope to XML
 	xmlBody, err := xml.MarshalIndent(envelope, "", "  ")
 	if err != nil {
 		return nil, fmt.Errorf("error marshaling XML: %v", err)
 	}
 
-	// Enviar la solicitud
+	// Send the request
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(xmlBody))
 	if err != nil {
 		return nil, fmt.Errorf("error creating request: %v", err)
@@ -58,7 +58,7 @@ func sendSOAPRequest(url string, requestBody AddRequest) ([]byte, error) {
 	}
 	defer resp.Body.Close()
 
-	// Leer la respuesta
+	// Read the response
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response: %v", err)
@@ -68,18 +68,18 @@ func sendSOAPRequest(url string, requestBody AddRequest) ([]byte, error) {
 }
 
 func main() {
-	// Dirección del servidor SOAP
+	// SOAP server URL
 	url := "http://localhost:8080/math"
 
-	// Crear la solicitud para la operación Add
+	// Create the request for the Add operation
 	request := AddRequest{A: 25, B: 25}
 
-	// Enviar la solicitud
+	// Send the request
 	responseData, err := sendSOAPRequest(url, request)
 	if err != nil {
 		log.Fatalf("Error making SOAP request: %v", err)
 	}
 
-	// Mostrar la respuesta
+	// Print the response
 	fmt.Println("Response:", string(responseData))
 }
